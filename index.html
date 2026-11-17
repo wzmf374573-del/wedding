@@ -617,131 +617,152 @@
     </div>
 
     <!-- JavaScript 互動邏輯 -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // ==========================================
-            // 3. 智能表單邏輯：參加人數 > 0 才顯示飲食習慣
-            // ==========================================
-            
-// ==========================================
-// 婚禮倒數計時器
-// ==========================================
-const weddingDate = new Date('2027-04-10T17:00:00+08:00').getTime();
+    
+<script>
+    // ==========================================
+    // 1. 婚禮倒數計時器
+    // 目標：2027/04/10 下午 17:00（台灣時間）
+    // ==========================================
+    (function () {
+        const weddingDate = new Date('2027-04-10T17:00:00+08:00').getTime();
 
-const daysElement = document.getElementById('cd-days');
-const hoursElement = document.getElementById('cd-hours');
-const minsElement = document.getElementById('cd-mins');
-const secsElement = document.getElementById('cd-secs');
+        const daysElement = document.getElementById('cd-days');
+        const hoursElement = document.getElementById('cd-hours');
+        const minsElement = document.getElementById('cd-mins');
+        const secsElement = document.getElementById('cd-secs');
 
-function updateCountdown() {
-    const now = new Date().getTime();
-    const distance = weddingDate - now;
+        // 確認倒數區塊存在
+        if (!daysElement || !hoursElement || !minsElement || !secsElement) {
+            console.error('倒數計時器錯誤：找不到倒數顯示欄位，請檢查 HTML 的 cd-days 等 ID。');
+            return;
+        }
 
-    if (distance <= 0) {
-        daysElement.textContent = '000';
-        hoursElement.textContent = '00';
-        minsElement.textContent = '00';
-        secsElement.textContent = '00';
-        return;
-    }
+        function updateCountdown() {
+            const now = Date.now();
+            const distance = weddingDate - now;
 
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((distance / (1000 * 60)) % 60);
-    const seconds = Math.floor((distance / 1000) % 60);
-
-    daysElement.textContent = String(days).padStart(3, '0');
-    hoursElement.textContent = String(hours).padStart(2, '0');
-    minsElement.textContent = String(minutes).padStart(2, '0');
-    secsElement.textContent = String(seconds).padStart(2, '0');
-}
-
-// 網頁載入立即計算，之後每秒更新
-updateCountdown();
-setInterval(updateCountdown, 1000);
-
-            
-            const guestsInput = document.getElementById('entry_422160171');
-            const attendanceSelect = document.getElementById('entry_543636210');
-            const diningGroup = document.getElementById('conditional-dining-group');
-            const dietaryRadios = document.querySelectorAll('input[name="entry.1937087665"]');
-
-            function evaluateDiningVisibility() {
-                const count = parseInt(guestsInput.value, 10);
-                if (!isNaN(count) && count > 0) {
-                    diningGroup.classList.remove('hidden');
-                } else {
-                    diningGroup.classList.add('hidden');
-                    dietaryRadios.forEach(radio => {
-                        radio.checked = false;
-                    });
-                }
+            if (distance <= 0) {
+                daysElement.textContent = '000';
+                hoursElement.textContent = '00';
+                minsElement.textContent = '00';
+                secsElement.textContent = '00';
+                return;
             }
 
-            guestsInput.addEventListener('input', evaluateDiningVisibility);
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((distance / (1000 * 60)) % 60);
+            const seconds = Math.floor((distance / 1000) % 60);
 
-            // 若選擇「不克參與」，自動將人數設為 0 並收合飲食欄位
-            attendanceSelect.addEventListener('change', () => {
-                if (attendanceSelect.value === '不克參與') {
-                    guestsInput.value = 0;
-                    evaluateDiningVisibility();
-                } else if (attendanceSelect.value === '準時赴約' && (guestsInput.value === '0' || guestsInput.value === '')) {
-                    guestsInput.value = 1;
-                    evaluateDiningVisibility();
-                }
-            });
+            daysElement.textContent = String(days).padStart(3, '0');
+            hoursElement.textContent = String(hours).padStart(2, '0');
+            minsElement.textContent = String(minutes).padStart(2, '0');
+            secsElement.textContent = String(seconds).padStart(2, '0');
+        }
 
-            // ==========================================
-            // 4. 隱藏式 Iframe 表單送出與回饋 Modal 控制
-            // ==========================================
-            const rsvpForm = document.getElementById('rsvp-form');
-            const submitBtn = document.getElementById('submit-btn');
-            const modal = document.getElementById('custom-modal');
-            const closeModalBtn = document.getElementById('close-modal-btn');
-            let isSubmitted = false;
+        // 網頁載入後立即執行，之後每秒更新
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    })();
 
-            rsvpForm.addEventListener('submit', () => {
-                isSubmitted = true;
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '資料傳送中... <span class="font-en tracking-widest ml-1">SENDING</span>';
 
-                // 確保若人數為 0 時，不送出飲食習慣數值
-                const count = parseInt(guestsInput.value, 10);
-                if (isNaN(count) || count <= 0) {
+    // ==========================================
+    // 2. 原本的表單互動功能
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // 參加人數 > 0 才顯示飲食習慣
+        const guestsInput = document.getElementById('entry_422160171');
+        const attendanceSelect = document.getElementById('entry_543636210');
+        const diningGroup = document.getElementById('conditional-dining-group');
+        const dietaryRadios = document.querySelectorAll('input[name="entry.1937087665"]');
+
+        function evaluateDiningVisibility() {
+            const count = parseInt(guestsInput.value, 10);
+
+            if (!isNaN(count) && count > 0) {
+                diningGroup.classList.remove('hidden');
+            } else {
+                diningGroup.classList.add('hidden');
+                dietaryRadios.forEach(radio => {
+                    radio.checked = false;
+                });
+            }
+        }
+
+        guestsInput.addEventListener('input', evaluateDiningVisibility);
+
+        // 若選擇不克參與，自動將人數設為 0
+        attendanceSelect.addEventListener('change', () => {
+            if (attendanceSelect.value === '不克參與') {
+                guestsInput.value = 0;
+                evaluateDiningVisibility();
+            } else if (
+                attendanceSelect.value === '準時赴約' &&
+                (guestsInput.value === '0' || guestsInput.value === '')
+            ) {
+                guestsInput.value = 1;
+                evaluateDiningVisibility();
+            }
+        });
+
+        // ==========================================
+        // 隱藏式 Iframe 表單送出與回饋 Modal
+        // ==========================================
+        const rsvpForm = document.getElementById('rsvp-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const modal = document.getElementById('custom-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+
+        let isSubmitted = false;
+
+        rsvpForm.addEventListener('submit', () => {
+            isSubmitted = true;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '資料傳送中... <span class="font-en tracking-widest ml-1">SENDING</span>';
+
+            const count = parseInt(guestsInput.value, 10);
+
+            if (isNaN(count) || count <= 0) {
+                dietaryRadios.forEach(radio => {
+                    radio.disabled = true;
+                });
+            }
+
+            setTimeout(() => {
+                if (isSubmitted) {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+
+                    rsvpForm.reset();
+
                     dietaryRadios.forEach(radio => {
-                        radio.disabled = true;
+                        radio.disabled = false;
                     });
+
+                    evaluateDiningVisibility();
+
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '送出出席回函 <span class="font-en tracking-widest ml-1">SUBMIT</span>';
+
+                    isSubmitted = false;
                 }
+            }, 900);
+        });
 
-                // 延遲顯示成功提示視窗並重置表單（確保表單已透過 hidden_iframe 送出）
-                setTimeout(() => {
-                    if (isSubmitted) {
-                        modal.classList.remove('hidden');
-                        modal.classList.add('flex');
-                        rsvpForm.reset();
-                        dietaryRadios.forEach(radio => {
-                            radio.disabled = false;
-                        });
-                        evaluateDiningVisibility();
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '送出出席回函 <span class="font-en tracking-widest ml-1">SUBMIT</span>';
-                        isSubmitted = false;
-                    }
-                }, 900);
-            });
+        closeModalBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        });
 
-            closeModalBtn.addEventListener('click', () => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
-            });
-
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
-                }
-            });
+            }
         });
-    </script>
+
+    });
+</script>
 </body>
 </html>
