@@ -622,6 +622,45 @@
             // ==========================================
             // 3. 智能表單邏輯：參加人數 > 0 才顯示飲食習慣
             // ==========================================
+            
+// ==========================================
+// 婚禮倒數計時器
+// ==========================================
+const weddingDate = new Date('2027-04-10T17:00:00+08:00').getTime();
+
+const daysElement = document.getElementById('cd-days');
+const hoursElement = document.getElementById('cd-hours');
+const minsElement = document.getElementById('cd-mins');
+const secsElement = document.getElementById('cd-secs');
+
+function updateCountdown() {
+    const now = new Date().getTime();
+    const distance = weddingDate - now;
+
+    if (distance <= 0) {
+        daysElement.textContent = '000';
+        hoursElement.textContent = '00';
+        minsElement.textContent = '00';
+        secsElement.textContent = '00';
+        return;
+    }
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((distance / (1000 * 60)) % 60);
+    const seconds = Math.floor((distance / 1000) % 60);
+
+    daysElement.textContent = String(days).padStart(3, '0');
+    hoursElement.textContent = String(hours).padStart(2, '0');
+    minsElement.textContent = String(minutes).padStart(2, '0');
+    secsElement.textContent = String(seconds).padStart(2, '0');
+}
+
+// 網頁載入立即計算，之後每秒更新
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+            
             const guestsInput = document.getElementById('entry_422160171');
             const attendanceSelect = document.getElementById('entry_543636210');
             const diningGroup = document.getElementById('conditional-dining-group');
